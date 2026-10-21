@@ -1310,7 +1310,7 @@ class HwpxMergePane(BaseMergePane):
 class DocumentMergeApp:
     def __init__(self, root: tk.Tk):
         self.root = root
-        self.root.title("문서 병합 프로그램 - PDF / HWPX Merger")
+        self.root.title("DOCUMENT_MERGE - 통합 문서 병합 프로그램")
         self.root.geometry("880x580")
         self.root.minsize(760, 460)
 

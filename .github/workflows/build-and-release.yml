@@ -1,4 +1,4 @@
-name: Build and Release PDF Merger EXE
+name: Build and Release DOCUMENT_MERGE EXE
 
 on:
   push:
@@ -37,14 +37,14 @@ jobs:
 
       - name: Build Standalone EXE with PyInstaller
         run: |
-          python -m PyInstaller --noconsole --onefile --clean --name "PDF_Merger" pdf_merge.py
+          python -m PyInstaller --noconsole --onefile --clean --name "DOCUMENT_MERGE" document_merge.py
 
       - name: Sign Executable with Authenticode Certificate
         shell: pwsh
         run: |
           $cert = New-SelfSignedCertificate `
             -Type CodeSigningCert `
-            -Subject "CN=PDF Merger Application" `
+            -Subject "CN=DOCUMENT_MERGE Application" `
             -CertStoreLocation "Cert:\CurrentUser\My" `
             -HashAlgorithm SHA256 `
             -KeyLength 2048 `
@@ -55,9 +55,9 @@ jobs:
             Select-Object -First 1 -ExpandProperty FullName
 
           if ($signtool) {
-            & $signtool sign /fd SHA256 /tr "http://timestamp.digicert.com" /td SHA256 /sha1 $cert.Thumbprint /d "PDF Merger" "dist\PDF_Merger.exe"
+            & $signtool sign /fd SHA256 /tr "http://timestamp.digicert.com" /td SHA256 /sha1 $cert.Thumbprint /d "DOCUMENT_MERGE" "dist\DOCUMENT_MERGE.exe"
           } else {
-            Set-AuthenticodeSignature -FilePath "dist\PDF_Merger.exe" -Certificate $cert -HashAlgorithm SHA256 -TimestampServer "http://timestamp.digicert.com"
+            Set-AuthenticodeSignature -FilePath "dist\DOCUMENT_MERGE.exe" -Certificate $cert -HashAlgorithm SHA256 -TimestampServer "http://timestamp.digicert.com"
           }
 
           Remove-Item -Path "Cert:\CurrentUser\My\$($cert.Thumbprint)" -Force -ErrorAction SilentlyContinue
@@ -65,8 +65,8 @@ jobs:
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: PDF_Merger-Windows-x64
-          path: dist/PDF_Merger.exe
+          name: DOCUMENT_MERGE-Windows-x64
+          path: dist/DOCUMENT_MERGE.exe
 
       - name: Determine Release Tag
         id: meta
@@ -85,17 +85,17 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.meta.outputs.tag }}
-          name: "PDF Merger ${{ steps.meta.outputs.tag }}"
+          name: "DOCUMENT_MERGE ${{ steps.meta.outputs.tag }}"
           body: |
-            ## PDF 병합 프로그램 (PDF Merger) ${{ steps.meta.outputs.tag }}
+            ## 통합 문서 병합 프로그램 (DOCUMENT_MERGE) ${{ steps.meta.outputs.tag }}
 
             GitHub Actions를 통해 자동 빌드 및 디지털 서명(SHA-256)된 Windows 단일 실행 파일입니다.
 
             ### 다운로드 안내
-            - **`PDF_Merger.exe`**: 별도의 파이썬 설치 없이 바로 실행 가능한 포터블 실행 파일
+            - **`DOCUMENT_MERGE.exe`**: 별도의 파이썬 설치 없이 바로 실행 가능한 포터블 실행 파일 (PDF 및 HWPX 카테고리별 병합 지원)
 
             > Built with **Google Antigravity** (**Gemini 4 Argon**)
-          files: dist/PDF_Merger.exe
+          files: dist/DOCUMENT_MERGE.exe
           draft: false
           prerelease: false
         env:
